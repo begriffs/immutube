@@ -1,17 +1,26 @@
 <html>
   <head>
-    <script>
-      var host = location.origin.replace(/^http/, 'ws')
-      var ws = new WebSocket(host);
-      ws.onmessage = function (event) {
-        var li = document.createElement('li');
-        li.innerHTML = JSON.parse(event.data);
-        document.querySelector('#pings').appendChild(li);
-      };
-    </script>
+    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
   </head>
   <body>
-    <h1>Pings</h1>
-    <ul id='pings'></ul>
+    <textarea id="area"></textarea>
+
+    <div id="events"></div>
+
+    <script>
+      $(function () {
+        var host = location.origin.replace(/^http/, 'ws')
+          , ws = new WebSocket(host);
+
+        ws.onmessage = function (event) {
+          console.log("test!", event)
+        };
+        $('#area').on('keyup', function(e){
+          ws.send(JSON.stringify(
+            {key: e.which, pos: e.target.selectionStart}
+          ));
+        });
+      });
+    </script>
   </body>
 </html>
