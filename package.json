@@ -20,6 +20,11 @@
     "express": "~3.5.1",
     "ws": "~0.4.31"
   },
+  "devDependencies": {
+    "supervisor": "latest",
+    "mocha": "latest",
+    "chai": "latest"
+  },
   "engines": {
     "node": "0.10.x"
   }

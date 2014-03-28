@@ -7,5 +7,5 @@ IO streams, and mathematical structures.
 
 ```sh
 npm install
-foreman start
+foreman start -f Procfile.dev
 ```
