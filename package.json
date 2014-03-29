@@ -18,10 +18,12 @@
   "dependencies": {
     "logfmt": "~1.1.2",
     "express": "~3.5.1",
-    "ws": "~0.4.31"
+    "ws": "~0.4.31",
+    "socket.io": "~0.9.6"
   },
   "devDependencies": {
     "supervisor": "latest",
+    "supertest": "~0.9.0",
     "mocha": "latest",
     "chai": "latest"
   },
