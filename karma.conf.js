@@ -16,16 +16,14 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test/test-main.js',
-      // {pattern: 'public/**/*.js', included: false},
-      {pattern: 'test/**/*.js', included: false}
+      {pattern: 'public/**/*.js', included: false},
+      {pattern: 'test/client/*.js', included: false}
     ],
-
-    proxies: {
-      '/images': 'http://localhost:8080/public/images'
-    },
 
     // list of files to exclude
     exclude: [ ],
+
+    browsers: ['PhantomJS'],
 
     // test results reporter to use
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
