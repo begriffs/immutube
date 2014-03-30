@@ -19,13 +19,19 @@
     "logfmt": "~1.1.2",
     "express": "~3.5.1",
     "ws": "~0.4.31",
-    "socket.io": "~0.9.6"
+    "socket.io": "~0.9.6",
+    "bower": "1.2.x"
   },
   "devDependencies": {
     "supervisor": "latest",
     "supertest": "~0.9.0",
     "mocha": "latest",
-    "chai": "latest"
+    "chai": "latest",
+    "karma": "~0.10.9",
+    "karma-mocha": "~0.1.1",
+    "karma-phantomjs-launcher": "latest",
+    "karma-chai": "~0.1.0",
+    "karma-requirejs": "~0.2.1"
   },
   "engines": {
     "node": "0.10.x"

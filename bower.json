@@ -1,0 +1,16 @@
+{
+  "name": "headline",
+  "version": "0.0.0",
+  "homepage": "http://github.com/begriffs/future-edit",
+  "private": false,
+  "dependencies": {
+    "jquery": "2.1.0",
+    "lodash": "~2.4"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ]
+}
