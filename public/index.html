@@ -12,6 +12,10 @@
         var host = location.origin.replace(/^http/, 'ws')
           , ws = io.connect(host);
 
+        $.get('/corpus', function(data) {
+          $('#area').val(data);
+        });
+
         ws.on('edit', function (e) {
           e = JSON.parse(e);
           var v = $('#area').val();

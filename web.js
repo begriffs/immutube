@@ -12,9 +12,17 @@ console.log('http server listening on %d', port);
 
 var corpus = '';
 
+app.get('/corpus', function (req, res) {
+  res.send(corpus);
+});
+
 console.log('websocket server created');
 io.on('connection', function (ws) {
   ws.on('edit', function(s) {
+    var edit = JSON.parse(s);
+    corpus = corpus.slice(0, edit.sel_start) +
+      edit.value +
+      corpus.slice(edit.sel_end);
     ws.broadcast.emit('edit', s);
   });
 });
