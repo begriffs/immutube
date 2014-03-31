@@ -27,11 +27,11 @@
     "supertest": "~0.9.0",
     "mocha": "latest",
     "chai": "latest",
-    "karma": "~0.10.9",
-    "karma-mocha": "~0.1.1",
+    "karma": "latest",
+    "karma-mocha": "latest",
     "karma-phantomjs-launcher": "latest",
-    "karma-chai": "~0.1.0",
-    "karma-requirejs": "~0.2.1"
+    "karma-chai": "latest",
+    "karma-requirejs": "latest"
   },
   "engines": {
     "node": "0.10.x"

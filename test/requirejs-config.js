@@ -9,20 +9,13 @@ for (var file in window.__karma__.files) {
 
 requirejs.config({
     // Karma serves files from '/base'
-  paths : {
-      'jquery': '/base/public/scripts/vendor/jquery/dist/jquery.min'
-    , 'lodash': '/base/public/scripts/vendor/lodash/dist/lodash'
-    , 'socketio': '/socket.io/socket.io'
+  paths: {
+    'lodash':   '/base/public/scripts/vendor/lodash/dist/lodash',
+    'resolver': '/base/public/scripts/resolver'
   },
   shim: {
-    jquery: {
-      exports: '$'
-    }
-    , lodash: {
+    lodash: {
       exports: '_'
-    }
-    , socketio: {
-      exports: 'io'
     }
   },
 
