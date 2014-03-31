@@ -10,15 +10,12 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server, {origins: '*:*'});
 console.log('http server listening on %d', port);
 
-console.log('websocket server created');
-io.on('connection', function(ws) {
-  console.log("CONNECTED")
-  ws.on('disconnect', function() {
-    console.log('websocket connection %d close', clients[ws]);
-  });
+var corpus = '';
 
+console.log('websocket server created');
+io.on('connection', function (ws) {
   ws.on('edit', function(s) {
-    ws.broadcast.emit('test', s);
+    ws.broadcast.emit('edit', s);
   });
 });
 server.listen(port);

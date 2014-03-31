@@ -8,26 +8,26 @@
 
     <div id="events"></div>
     <script>
-      var insert = function (index, s, orig) {
-        if (index > 0) {
-          return orig.substring(0, index) + s + orig.substring(index, orig.length);
-        }
-        else {
-          return s + orig;
-        }
-      };
       $(function () {
         var host = location.origin.replace(/^http/, 'ws')
           , ws = io.connect(host);
 
-        ws.on('test', function (e) {
+        ws.on('edit', function (e) {
           e = JSON.parse(e);
-          $('#area').val(insert(e.pos, String.fromCharCode(e.key), $('#area').val()));
+          var v = $('#area').val();
+          $('#area').val(
+            v.slice(0, e.sel_start) +
+            e.value +
+            v.slice(e.sel_end)
+          );
         });
-        $('#area').on('keyup', function(e){
-          ws.emit('edit', JSON.stringify(
-            {key: e.which, pos: e.target.selectionStart}
-          ));
+
+        $('#area').on('keypress', function(e){
+          ws.emit('edit', JSON.stringify({
+            value: String.fromCharCode(e.which),
+            sel_start: e.target.selectionStart,
+            sel_end:   e.target.selectionEnd
+          }));
         });
       });
     </script>
