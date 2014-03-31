@@ -18,12 +18,23 @@
 
         ws.on('edit', function (e) {
           e = JSON.parse(e);
+
+          var area = document.getElementById('area');
+          var start = area.selectionStart, end = area.selectionEnd;
+
           var v = $('#area').val();
           $('#area').val(
             v.slice(0, e.sel_start) +
             e.value +
             v.slice(e.sel_end)
           );
+
+          var added_before = 0;
+          if(e.sel_start < start) {
+            added_before = 1 - (Math.min(start, e.sel_end) - e.sel_start);
+          }
+          area.focus();
+          area.setSelectionRange(start + added_before, end + added_before);
         });
 
         $('#area').on('keypress', function(e){
