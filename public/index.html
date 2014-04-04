@@ -2,6 +2,10 @@
   <head>
     <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/vendor/pointfree/dist/pointfree.browser.js"></script>
+    <script>
+      PointFree.expose(window)
+    </script>
   </head>
   <body>
     <textarea id="area"></textarea>
@@ -10,38 +14,64 @@
     <script>
       $(function () {
         var host = location.origin.replace(/^http/, 'ws')
-          , ws = io.connect(host);
+          , ws = io.connect(host)
+          , $area = $('#area')
+          , area = $area[0]
+          , setVal = curry(function(a,x){ return a.val(x) })
+          , getVal = function(a){ return a.val() };
 
-        $.get('/corpus', function(data) {
-          $('#area').val(data);
-        });
+        var upto = function (range, position) {
+          return {
+            start: range.start,
+            end: Math.max(
+              range.start,
+              Math.min(range.end, position)
+            )
+          };
+        };
 
-        ws.on('edit', function (e) {
-          e = JSON.parse(e);
+        var length = function (range) {
+          return range.end - range.start;
+        };
 
-          var area = document.getElementById('area');
+        var subtract = curry(function(x,y) {
+          return x - y;
+        })
+
+
+        var charsDestroyedBeforeCursor = compose(length, upto);
+
+        var charsCreatedBeforeCursor = function(range, position) {
+          return range.start < position ? 1 : 0;
+        }
+
+        var updateField = function (e) {
           var start = area.selectionStart, end = area.selectionEnd;
 
-          var v = $('#area').val();
-          $('#area').val(
-            v.slice(0, e.sel_start) +
+          var v = getVal($area);
+          setVal(
+            $area,
+            v.slice(0, e.start) +
             e.value +
-            v.slice(e.sel_end)
+            v.slice(e.end)
           );
+          var cursor_delta = charsCreatedBeforeCursor(e, start) -
+            charsDestroyedBeforeCursor(e, start);
 
-          var added_before = 0;
-          if(e.sel_start < start) {
-            added_before = 1 - (Math.min(start, e.sel_end) - e.sel_start);
-          }
           area.focus();
-          area.setSelectionRange(start + added_before, end + added_before);
-        });
+          area.setSelectionRange(start + cursor_delta, end + cursor_delta);
+        };
 
-        $('#area').on('keypress', function(e){
+        $.get('/corpus', setVal($area)); 
+        //fmap(setVal, httpGet('/corpus'))
+
+        ws.on('edit', compose(updateField, JSON.parse))
+
+        $area.on('keypress', function(e){
           ws.emit('edit', JSON.stringify({
             value: String.fromCharCode(e.which),
-            sel_start: e.target.selectionStart,
-            sel_end:   e.target.selectionEnd
+            start: e.target.selectionStart,
+            end:   e.target.selectionEnd
           }));
         });
       });

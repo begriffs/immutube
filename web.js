@@ -20,9 +20,9 @@ console.log('websocket server created');
 io.on('connection', function (ws) {
   ws.on('edit', function(s) {
     var edit = JSON.parse(s);
-    corpus = corpus.slice(0, edit.sel_start) +
+    corpus = corpus.slice(0, edit.start) +
       edit.value +
-      corpus.slice(edit.sel_end);
+      corpus.slice(edit.end);
     ws.broadcast.emit('edit', s);
   });
 });
