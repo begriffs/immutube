@@ -13,10 +13,15 @@ define([
 	return function() {
 	   var host = location.origin.replace(/^http/, 'ws')
           , ws = io.connect(host)
-          , $area = $('#area')
-          , area = $area[0]
-          , setVal__ = _.curry(function(a,x){ return a.val(x) })
-          , getVal__ = function(a){ return a.val() };
+          , getField__ = function(a) { return IO(function(){ return $(a); }) }
+          , setVal__ = _.curry(function(a, x){ return IO(function(){ return a.val(x) }) })
+          , getVal__ = function(a){ return IO(function(){ return a.val()}) });
+          , setSelectionRange__ = _.curry(function(x, c) {
+          		return IO(function() {
+          			return x.setSelectionRange(c.start, c.end);
+          		})
+          	})
+          , focus__ = function(x) { return IO(function(){ return  x.focus(); }) })
 
         var upto = function (range, position) {
           // return { start: range.start, end:  Math.min(range.end, position) };
@@ -33,33 +38,38 @@ define([
           return range.start < position ? 1 : 0;
         }
 
+        //+ updateField :: [String, Cursor] -> IO(_)
         var updateField = function(result) {
-        	var cursor = _.last(result);
-          setVal__($area, _.first(result))
-          area.focus();
-          area.setSelectionRange(cursor.start, cursor.end);
+        	return getField__('#area').map(function(a) {
+        		return setVal__(a)(_.first(result)).ap(focus__(_.first(a))).ap(setSelectionRange__(_.first(a), _.last(result)))
+        	});
         };
 
-        var getNewCursor = function(r) {
-        	var start = area.selectionStart;
-        	var end = area.selectionEnd;
-        	var delta = charsCreatedBeforeCursor(r, start) - charsDestroyedBeforeCursor(r, start);
-        	return {start: (start+delta), end: (end+delta), value: r.value}
-        }
+        var selStart__ = function(a) { return IO(function(){ return a.selectionStart; }) }
+        var selEnd__ = function(a) { return IO(function(){ return a.selectionEnd; }) }
+
+        //+ getNewCursor :: TextField -> Range -> IO(Range)
+        var getNewCursor = _.curry(function(a, r) {
+	        return selStart__(a).ap(selEnd__(a)).map(function(s, e) {
+	        	var delta = charsCreatedBeforeCursor(r, s) - charsDestroyedBeforeCursor(r, s);
+        		return {start: (s+delta), end: (e+delta), value: r.value}	
+	        });
+        })
 
         var sliceStart = _.curry(function(text, n) { return text.slice(0, n.start); });
         var sliceEnd = _.curry(function(text, n) { return text.slice(n.end); });
 
-        var getNewText = function(e) {
-        	var text = getVal__($area);
-					var spliceField = mconcat([sliceStart(text), pluck('value'), sliceEnd(text))])
-					return spliceField(e)
-        }
+        //+ getNewText :: TextField -> Range -> IO(String)
+        var getNewText = _.curry(function(a, r) {
+        	return getVal__(a).map(function(t) {
+        		return mconcat([sliceStart(t), pluck('value'), sliceEnd(t)])(r);
+        	})
+        })
 
-        $.get('/corpus', setVal__($area));
-        //fmap(setVal, httpGet('/corpus'))
+        //+ httpInit :: IO(Promise(Range))
+        var httpInit = fmap(setVal__($area), httpGet('/corpus'))
 
-        ws.on('edit', compose(updateField, A.ampersand(getNewText, getNewCursor), JSON.parse))
+        ws.on('edit', compose(runIO, updateField, A.ampersand(getNewText($area), getNewCursor(area)), JSON.parse))
 
         $area.on('keypress', function(e){
           ws.emit('edit', JSON.stringify({
