@@ -1,80 +1,9 @@
 <html>
   <head>
-    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/scripts/vendor/pointfree/dist/pointfree.browser.js"></script>
-    <script>
-      PointFree.expose(window)
-    </script>
   </head>
   <body>
     <textarea id="area"></textarea>
-
     <div id="events"></div>
-    <script>
-      $(function () {
-        var host = location.origin.replace(/^http/, 'ws')
-          , ws = io.connect(host)
-          , $area = $('#area')
-          , area = $area[0]
-          , setVal = curry(function(a,x){ return a.val(x) })
-          , getVal = function(a){ return a.val() };
-
-        var upto = function (range, position) {
-          return {
-            start: range.start,
-            end: Math.max(
-              range.start,
-              Math.min(range.end, position)
-            )
-          };
-        };
-
-        var length = function (range) {
-          return range.end - range.start;
-        };
-
-        var subtract = curry(function(x,y) {
-          return x - y;
-        })
-
-
-        var charsDestroyedBeforeCursor = compose(length, upto);
-
-        var charsCreatedBeforeCursor = function(range, position) {
-          return range.start < position ? 1 : 0;
-        }
-
-        var updateField = function (e) {
-          var start = area.selectionStart, end = area.selectionEnd;
-
-          var v = getVal($area);
-          setVal(
-            $area,
-            v.slice(0, e.start) +
-            e.value +
-            v.slice(e.end)
-          );
-          var cursor_delta = charsCreatedBeforeCursor(e, start) -
-            charsDestroyedBeforeCursor(e, start);
-
-          area.focus();
-          area.setSelectionRange(start + cursor_delta, end + cursor_delta);
-        };
-
-        $.get('/corpus', setVal($area)); 
-        //fmap(setVal, httpGet('/corpus'))
-
-        ws.on('edit', compose(updateField, JSON.parse))
-
-        $area.on('keypress', function(e){
-          ws.emit('edit', JSON.stringify({
-            value: String.fromCharCode(e.which),
-            start: e.target.selectionStart,
-            end:   e.target.selectionEnd
-          }));
-        });
-      });
-    </script>
+    <script data-main="/requirejs-config" src="/scripts/vendor/requirejs/require.js"></script>
   </body>
 </html>

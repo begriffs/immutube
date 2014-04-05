@@ -4,6 +4,7 @@
   "homepage": "http://github.com/begriffs/future-edit",
   "private": false,
   "dependencies": {
+    "requirejs": "latest",
     "jquery": "2.1.0",
     "lodash": "~2.4",
     "pointfree": "DrBoolean/pointfree-fantasy"
