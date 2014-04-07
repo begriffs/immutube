@@ -1,24 +1,43 @@
 define(['lodash'], function(_) {
+  'use strict';
 
-var runIO = function(io) {
-  var result = io.runIO();
-  return result && result.runIO ? runIO(result) : result;
-};
-
-var IOType = function(fn) {
-  this.val = fn;
-}
-
-IOType.prototype.map = function(f) {
-  var computation = this.val;
-  return function(x) {
-    return f(computation(x));
+  var runIO = function(io) {
+    return io.val();
   };
-}
 
-var IO = function(fn) {
-  return (new IOType(fn));
-};
+  var IOType = function(fn) {
+    this.val = fn;
+  };
+  
+  var IO = function(fn) {
+    return (new IOType(fn));
+  };
 
-return {IO: IO, runIO: runIO};
+  IOType.of = function(x) {
+    return IO(function() {
+      return x;
+    });
+  };
+  IOType.prototype.of = IOType.of;
+
+  IOType.prototype.chain = function(g) {
+    var io = this;
+    return IO(function() {
+      return g(io.val()).val();
+    });
+  };
+
+  // Derived
+  IOType.prototype.map = function(f) {
+    return this.chain(function(a) {
+      return IOType.of(f(a));
+    });
+  };
+  IOType.prototype.ap = function(a) {
+    return this.chain(function(f) {
+      return a.map(f);
+    });
+  };
+  return {IO: IO, runIO: runIO};
 });
+
