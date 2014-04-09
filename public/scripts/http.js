@@ -10,6 +10,17 @@ define(['lodash', 'jquery'], function(_, $) {
         });
 			};
 			return promise;
+		},
+
+		getJSON: function(url) {
+			var promise = $.getJSON(url);
+			promise.map = function(f) {
+				return promise.then(function(x){
+          promise.val = x;
+          return f(x);
+        });
+			};
+			return promise;
 		}
-	};
+	}
 });

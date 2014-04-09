@@ -80,13 +80,16 @@ define([
       return A.ampersand(getNewText(a, v), getNewCursor(a[0], start, end))(r);
     });
 
+    // instance Monad ((->) r) where  
+    // return x = \_ -> x  
+    // h >>= f = \w -> f (h w) w  
+
     ws.on('edit', function (e) {
-      var r = JSON.parse(e);
       runIO(getField('#area').chain(function (a) {
         return getVal(a).chain(function (v) {
           return selStart(a).chain(function(start){
             return selEnd(a).chain(function(end){
-              return compose(updateField(a), doWork(a, start, end, v))(r);
+              return compose(updateField(a), doWork(a, start, end, v), JSON.parse)(e);
             });
           });
         });

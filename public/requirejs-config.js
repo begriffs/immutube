@@ -9,7 +9,7 @@ require.config({ baseUrl: '/scripts'
                        , lodash: { exports: '_' }
                        }
                 });
-require(['pointfree', 'app'], function(pointfree, app){
+require(['pointfree', 'youtube'], function(pointfree, app){
   pointfree.expose(window);
   app();
 });
