@@ -1,4 +1,4 @@
-/* global define, liftA2, sequenceA, mjoin, mconcat, fmap, location, compose */
+/* global id, define, fmap, compose, mconcat */
 define([
 	'jquery'
 , 'lodash'
