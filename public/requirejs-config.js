@@ -11,5 +11,9 @@ require.config({ baseUrl: '/scripts'
                        }
                 });
 require(['youtube', 'io'], function(app, io){
-  io.runIO(app("#results", {q: 'cheese'})).map(io.runIO)
+  var prog = app({q: 'cats'});
+  
+  prog.runIO().map(function(x) {
+    $('#results').html(x)
+  })
 });

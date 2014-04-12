@@ -7,6 +7,7 @@ define(['lodash'], function(_) {
 
   var IOType = function(fn) {
     this.val = fn;
+    this.runIO = this.val;
   };
   
   var IO = function(fn) {
@@ -38,6 +39,14 @@ define(['lodash'], function(_) {
       return a.map(f);
     });
   };
-  return {IO: IO, runIO: runIO};
+
+  var extendFn = function() {
+    Function.prototype.toIO = function() {
+      var self = this;
+      return function(x) { return IO(function() { return self(x) }); };
+    };
+  };
+
+  return {IO: IO, runIO: runIO, extendFn: extendFn};
 });
 

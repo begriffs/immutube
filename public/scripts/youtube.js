@@ -8,6 +8,8 @@ define([
 ], function($, _, io, http, P) {
   'use strict';
 
+  io.extendFn();
+
   var IO = io.IO
     , K = function(x){ return function() { return x; }; }
     , pluck = _.curry(function(x,obj) { return obj[x]; })
@@ -21,14 +23,10 @@ define([
   // type Selector = String
 
   //+ searchUrl :: Term -> URL
-  var searchUrl = _.curry(function(t) { return 'http://gdata.youtube.com/feeds/api/videos?' + $.param(t) + "&alt=json"; });
+  var searchUrl = function(t) { return 'http://gdata.youtube.com/feeds/api/videos?' + $.param(t) + "&alt=json"; };
 
   //+ search :: Term -> IO Future JSON
-  var search = function (term) {
-    return IO(function() {
-      return http.getJSON(searchUrl(term));
-    });
-  };
+  var search = compose(http.getJSON, searchUrl).toIO()
 
   //+ getTitle :: {title: {$t: String}} -> String
   var getTitle = compose(pluck('$t'), pluck('title'));
@@ -36,14 +34,9 @@ define([
   //+ render :: JSON -> HTML
   var render = compose(join('<br/>'), fmap(getTitle), pluck('entry'), pluck('feed'));
 
-  //+ setVal :: Selector -> HTML -> IO Dom
-  var setVal = _.curry(function(a, x){ return IO(function(){ return $(a).html(x); }); });
+  //+ displayResults :: Selector -> Term -> IO Future HTML
+  var displayResults = compose(fmap(fmap(render)), search)
 
-  //+ displayResults :: Selector -> Term -> IO Future IO Dom
-  var displayResults = _.curry(function(sel, param) {
-    return compose(fmap(fmap(compose(setVal(sel), render))), search)(param);
-  });
-
-  //debugger;
   return displayResults;
 });
+
