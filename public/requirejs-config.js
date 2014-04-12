@@ -10,7 +10,6 @@ require.config({ baseUrl: '/scripts'
                        , lodash: { exports: '_' }
                        }
                 });
-require(['pointfree', 'youtube'], function(pointfree, app){
-  pointfree.expose(window);
-  app();
+require(['io', 'youtube'], function(io, app){
+  var x = io.runIO(app("#results", {q: 'cheese'})).map(function(x){ debugger; });
 });

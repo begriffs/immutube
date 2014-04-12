@@ -9,7 +9,7 @@
   "indent": 2,
   "latedef": true,
   "laxcomma": true,
-  "newcap": true,
+  "newcap": false,
   "noarg": true,
   "quotmark": true,
   "regexp": true,
