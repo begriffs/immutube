@@ -1,6 +1,6 @@
 /* global define */
 define([
-	'jquery'
+  'jquery'
 , 'lodash'
 , 'io'
 , 'http'
@@ -16,13 +16,12 @@ define([
     , fmap = P.fmap;
 
   var log2 = _.curry(function(tag, x) {console.log(tag, x); return x; } )
-  var D = function (x) { debugger; return x;}
 
   // type Term = {q: String}
   // type Selector = String
 
   //+ searchUrl :: Term -> URL
-  var searchUrl = _.curry(function(t) { return 'http://gdata.youtube.com/feeds/api/videos?' + $.param(t); });
+  var searchUrl = _.curry(function(t) { return 'http://gdata.youtube.com/feeds/api/videos?' + $.param(t) + "&alt=json"; });
 
   //+ search :: Term -> IO Future JSON
   var search = function (term) {
@@ -35,7 +34,7 @@ define([
   var getTitle = compose(pluck('$t'), pluck('title'));
 
   //+ render :: JSON -> HTML
-  var render = compose(join('<br/>'), fmap(getTitle), pluck('entry'), pluck('feed'), D);
+  var render = compose(join('<br/>'), fmap(getTitle), pluck('entry'), pluck('feed'));
 
   //+ setVal :: Selector -> HTML -> IO Dom
   var setVal = _.curry(function(a, x){ return IO(function(){ return $(a).html(x); }); });

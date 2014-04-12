@@ -10,6 +10,6 @@ require.config({ baseUrl: '/scripts'
                        , lodash: { exports: '_' }
                        }
                 });
-require(['io', 'youtube'], function(io, app){
-  var x = io.runIO(app("#results", {q: 'cheese'})).map(function(x){ debugger; });
+require(['youtube', 'io'], function(app, io){
+  io.runIO(app("#results", {q: 'cheese'})).map(io.runIO)
 });
