@@ -1,13 +1,6 @@
 define(['lodash', 'jquery', 'bacon'], function(_, $, bacon) {
   'use strict';
 
-  var baconMap = function(f) {
-		var b1 = new bacon.Bus();
-		b1.map = baconMap;
-		this.onValue(function(x) { b1.push(f(x)); });
-		return b1;
-	};
-
 	return {
 		get: function(url) {
 			var promise = $.get(url);
@@ -23,7 +16,6 @@ define(['lodash', 'jquery', 'bacon'], function(_, $, bacon) {
 		getJSON: function(url) {
 			var b = new bacon.Bus();
 			$.getJSON(url, function(resp) { b.push(resp); });
-			b.map = baconMap;
 			return b;
 		}
 	};
