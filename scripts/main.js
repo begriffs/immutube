@@ -1,3 +1,5 @@
+/* global document */
+
 require.config({ baseUrl: '/scripts'
                , paths : { 'jquery': 'vendor/jquery/dist/jquery.min'
                          , 'lodash': 'vendor/lodash/dist/lodash'
@@ -19,27 +21,28 @@ require([
   'lodash',
   'extensions'
 ], function($, P, app, io, Maybe, _){
+  'use strict';
 
-$(function() {
+  $(function() {
 
-  var setHtml = _.curry(function(sel, x){ return $(sel).html(x); })
-  var render = setHtml("#results") 
-  var playerHtml = function(yid) {
-    return '<iframe width="320" height="240" src="//www.youtube.com/embed/'+yid+'" frameborder="0" allowfullscreen></iframe>'
-  };
+    var setHtml = _.curry(function(sel, x) { return $(sel).html(x); });
+    var render = setHtml('#results');
+    var playerHtml = function(yid) {
+      return '<iframe width="320" height="240" src="//www.youtube.com/embed/'+yid+'" frameborder="0" allowfullscreen></iframe>';
+    };
 
-  var insertPlayer = P.compose(setHtml('#player'), playerHtml)
+    var insertPlayer = P.compose(setHtml('#player'), playerHtml);
 
-  var tableClicks = $(document).asEventStream('click')
-  tableClicks.map(function(e){ return Maybe( $(e.target).data('youtubeid') ); }).map(function(m){
-    m.map(insertPlayer);
-  })
+    var tableClicks = $(document).asEventStream('click');
+    tableClicks.map(function(e){ return Maybe( $(e.target).data('youtubeid') ); }).map(function(m) {
+      m.map(insertPlayer);
+    });
 
-  var toParam = function (x) { return {q: x.target.value} }
+    var toParam = function (x) { return {q: x.target.value}; };
 
-  var prog = P.compose(P.fmap(render), io.runIO, app)
-  var searches = $('#search').asEventStream('keydown').debounce(300);
-  P.fmap(P.compose(prog, toParam), searches)
-})
+    var prog = P.compose(P.fmap(render), io.runIO, app);
+    var searches = $('#search').asEventStream('keydown').debounce(300);
+    P.fmap(P.compose(prog, toParam), searches);
 
+  });
 });
