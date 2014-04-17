@@ -15,11 +15,10 @@ require([
   'pointfree',
   'youtube',
   'io',
-  'search',
   'maybe',
   'lodash',
   'extensions'
-], function($, P, app, io, searches, Maybe, _){
+], function($, P, app, io, Maybe, _){
 
 $(function() {
 
@@ -39,6 +38,7 @@ $(function() {
   var toParam = function (x) { return {q: x.target.value} }
 
   var prog = P.compose(P.fmap(render), io.runIO, app)
+  var searches = $('#search').asEventStream('keydown').debounce(300);
   P.fmap(P.compose(prog, toParam), searches)
 })
 
