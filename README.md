@@ -1,11 +1,14 @@
-## Future Edit
+## Immutube
 
-Realtime collaborative editor built with immutable data structures,
-IO streams, and mathematical structures.
+```haskell
+search :: [Char] -> IO Future Maybe [CatVideo]
+```
 
 ### Running
 
 ```sh
-npm install
-foreman start -f Procfile.dev
+bower install
+python -m SimpleHTTPServer
 ```
+
+Then visit `http://localhost:8000`.

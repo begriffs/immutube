@@ -1,11 +1,13 @@
 {
-  "name": "headline",
+  "name": "immutube",
   "version": "0.0.0",
-  "homepage": "http://github.com/begriffs/future-edit",
+  "homepage": "http://github.com/begriffs/immutube",
   "private": false,
   "dependencies": {
+    "requirejs": "latest",
     "jquery": "2.1.0",
     "lodash": "~2.4",
+    "bacon": "latest",
     "pointfree": "DrBoolean/pointfree-fantasy"
   },
   "ignore": [
