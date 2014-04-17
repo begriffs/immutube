@@ -14,6 +14,8 @@ define([
     , K = function(x){ return function() { return x; }; }
     , pluck = _.curry(function(x,obj) { return obj[x]; })
     , join = _.curry(function(x,s){ return s.join(x); })
+    , split = _.curry(function(x,s) { return s.split(x); })
+    , last = function(s) { return s[s.length - 1]; }
     , compose = P.compose
     , fmap = P.fmap;
 
@@ -30,9 +32,12 @@ define([
 
   //+ getTitle :: {title: {$t: String}} -> String
   var getTitle = compose(pluck('$t'), pluck('title'));
-
+  var getId    = compose(last, split('/'), pluck('$t'), pluck('id'));
+  
+  var toLi = function(t){return $('<li/>', {text: getTitle(t), 'data-youtubeid': getId(t)})}
+    
   //+ render :: JSON -> HTML
-  var render = compose(join('<br/>'), fmap(getTitle), pluck('entry'), pluck('feed'));
+  var render = compose(fmap(toLi), pluck('entry'), pluck('feed'));
 
   //+ displayResults :: Selector -> Term -> IO Future HTML
   var displayResults = compose(fmap(fmap(render)), search)

@@ -16,13 +16,25 @@ require([
   'youtube',
   'io',
   'search',
+  'maybe',
+  'lodash',
   'extensions'
-], function($, P, app, io, searches){
+], function($, P, app, io, searches, Maybe, _){
 
 $(function() {
-  var render = function(x) {
-    $('#results').html(x)
-  }
+
+  var setHtml = _.curry(function(sel, x){ return $(sel).html(x); })
+  var render = setHtml("#results") 
+  var playerHtml = function(yid) {
+    return '<iframe width="320" height="240" src="//www.youtube.com/embed/'+yid+'" frameborder="0" allowfullscreen></iframe>'
+  };
+
+  var insertPlayer = P.compose(setHtml('#player'), playerHtml)
+
+  var tableClicks = $(document).asEventStream('click')
+  tableClicks.map(function(e){ return Maybe( $(e.target).data('youtubeid') ); }).map(function(m){
+    m.map(insertPlayer);
+  })
 
   var toParam = function (x) { return {q: x.target.value} }
 
