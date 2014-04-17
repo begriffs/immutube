@@ -1,7 +1,7 @@
 {
-  "name": "headline",
+  "name": "immutube",
   "version": "0.0.0",
-  "homepage": "http://github.com/begriffs/future-edit",
+  "homepage": "http://github.com/begriffs/immutube",
   "private": false,
   "dependencies": {
     "requirejs": "latest",
