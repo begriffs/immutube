@@ -1,4 +1,4 @@
-define(['lodash'], function(_) {
+define([], function() {
   'use strict';
 
   var runIO = function(io) {

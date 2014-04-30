@@ -4,6 +4,7 @@ require.config({ baseUrl: '/scripts'
                , paths : { 'jquery': 'vendor/jquery/dist/jquery.min'
                          , 'lodash': 'vendor/lodash/dist/lodash'
                          , 'pointfree': 'vendor/pointfree/dist/pointfree.amd'
+                         , 'future': 'data.future.umd'
                          , 'bacon': 'vendor/bacon/dist/Bacon.min'
                          , 'socketio': '/socket.io/socket.io'
                          }
@@ -14,35 +15,12 @@ require.config({ baseUrl: '/scripts'
                 });
 require([
   'jquery',
-  'pointfree',
-  'youtube',
+  'app',
   'io',
-  'maybe',
-  'lodash',
   'extensions'
-], function($, P, app, io, Maybe, _){
+], function($, app, io){
   'use strict';
 
-  $(function() {
-
-    var setHtml = _.curry(function(sel, x) { return $(sel).html(x); });
-    var render = setHtml('#results');
-    var playerHtml = function(yid) {
-      return '<iframe width="320" height="240" src="//www.youtube.com/embed/'+yid+'" frameborder="0" allowfullscreen></iframe>';
-    };
-
-    var insertPlayer = P.compose(setHtml('#player'), playerHtml);
-
-    var tableClicks = $(document).asEventStream('click');
-    tableClicks.map(function(e){ return Maybe( $(e.target).data('youtubeid') ); }).map(function(m) {
-      m.map(insertPlayer);
-    });
-
-    var toParam = function (x) { return {q: x.target.value}; };
-
-    var prog = P.compose(P.fmap(render), io.runIO, app);
-    var searches = $('#search').asEventStream('keydown').debounce(300);
-    P.fmap(P.compose(prog, toParam), searches);
-
-  });
+  io.extendFn(); // globally alters Function's prototype
+  $(app);
 });

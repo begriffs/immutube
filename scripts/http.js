@@ -1,22 +1,13 @@
-define(['lodash', 'jquery', 'bacon'], function(_, $, bacon) {
+define(['jquery', 'future'], function($, Future) {
   'use strict';
 
-	return {
-		get: function(url) {
-			var promise = $.get(url);
-			promise.map = function(f) {
-				return promise.then(function(x){
-          promise.val = x;
-          return f(x);
-        });
-			};
-			return promise;
-		},
+  // var httpGet = _.curry(function(url, cb) { $.getJSON(url, cb) })
 
+	return {
 		getJSON: function(url) {
-			var b = new bacon.Bus();
-			$.getJSON(url, function(resp) { b.push(resp); });
-			return b;
+			return new Future(function(rej, res) {
+				$.getJSON(url, res);	
+			});
 		}
 	};
 });
