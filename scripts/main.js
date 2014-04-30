@@ -16,8 +16,7 @@ require.config({ baseUrl: '/scripts'
 require([
   'jquery',
   'app',
-  'io',
-  'extensions'
+  'io'
 ], function($, app, io){
   'use strict';
 

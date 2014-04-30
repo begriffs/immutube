@@ -26,9 +26,8 @@ define([
   var toYoutubeId = function(e){ return $(e.target).data('youtubeid'); }
   var makePlayer = compose(fmap(Player.create), Maybe, toYoutubeId)
   var playerStream = Bacon.fromEventTarget(document, "click").map(makePlayer);
-  
 
   // run app
-  youTubeStream.map(fork(setHtml('#results')));
-  playerStream.map(fmap(setHtml('#player')));
+  youTubeStream.onValue(fork(setHtml('#results')));
+  playerStream.onValue(fmap(setHtml('#player')));
 });
