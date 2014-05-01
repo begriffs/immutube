@@ -1,7 +1,7 @@
 ## Immutube
 
 ```haskell
-search :: [Char] -> IO Future Maybe [CatVideo]
+search :: [Char] -> Future Maybe [CatVideo]
 ```
 
 ### Running
