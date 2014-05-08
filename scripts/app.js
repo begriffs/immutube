@@ -23,9 +23,17 @@ define([
 
   // PURE //////////////////////////////////////////////////////////////////////////////
 
+  //+ DomEvent -> String
+  var eventValue = compose(_.get('value'), _.get('target'));
+
+  //+ DomEvent -> EventStream String
+  var valueStream = compose(map(eventValue), listen('keyup'));
+
   //+ search :: Selector -> IO EventStream String
-  var getInputStream = compose(map(listen('keyup')), $.toIO());
+  var getInputStream = compose(map(valueStream), $.toIO());
 
   // IMPURE ////////////////////////////////////////////////////////////////////////////
-  io.runIO(getInputStream('#search')).onValue(log);
+
+  getInputStream('#search').runIO().onValue(log);
+
 });
