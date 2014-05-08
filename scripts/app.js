@@ -42,16 +42,22 @@ define([
   //+ getInputStream :: Selector -> IO EventStream String
   var getInputStream = compose(map(urlStream), $.toIO());
 
-  //+ videoUrls :: YoutubeResponse -> [Entry]
-  var videoEntries = compose(_.get('entry'), _.get('feed'));
+  //+ render :: Entry -> Dom
+  var render = function(e) {
+    return $('<li/>', {text: e.title.$t, 'data-youtubeid': e.id.$t});
+  };
 
-  //+ search :: URL -> Future [Entry]
+  //+ videoEntries :: YoutubeResponse -> [Dom]
+  var videoEntries = compose(map(render), _.get('entry'), _.get('feed'));
+
+  //+ search :: URL -> Future [Dom]
   var search = compose(map(videoEntries), http.getJSON);
-
 
 
   // IMPURE ////////////////////////////////////////////////////////////////////////////
 
-  getInputStream('#search').runIO().onValue(compose(fork(log), search));
+  getInputStream('#search').runIO().onValue(
+    compose(fork(setHtml('#results')), search)
+  );
 
 });
