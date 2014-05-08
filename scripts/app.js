@@ -7,7 +7,8 @@ define([
 , 'player'
 , 'io'
 , 'bacon'
-], function($, _, P, Maybe, Player, io, bacon) {
+, 'http'
+], function($, _, P, Maybe, Player, io, bacon, http) {
   'use strict';
   io.extendFn();
 
@@ -23,17 +24,34 @@ define([
 
   // PURE //////////////////////////////////////////////////////////////////////////////
 
-  //+ DomEvent -> String
+  //+ eventValue :: DomEvent -> String
   var eventValue = compose(_.get('value'), _.get('target'));
 
-  //+ DomEvent -> EventStream String
+  //+ valueStream :: DomEvent -> EventStream String
   var valueStream = compose(map(eventValue), listen('keyup'));
 
-  //+ search :: Selector -> IO EventStream String
-  var getInputStream = compose(map(valueStream), $.toIO());
+  //+ termToUrl :: String -> URL
+  var termToUrl = function(term) {
+    return 'http://gdata.youtube.com/feeds/api/videos?' +
+      $.param({q: term, alt: 'json'});
+  };
+
+  //+ urlStream :: DomEvent -> EventStream String
+  var urlStream = compose(map(termToUrl), valueStream);
+
+  //+ getInputStream :: Selector -> IO EventStream String
+  var getInputStream = compose(map(urlStream), $.toIO());
+
+  //+ videoUrls :: YoutubeResponse -> [Entry]
+  var videoEntries = compose(_.get('entry'), _.get('feed'));
+
+  //+ search :: URL -> Future [Entry]
+  var search = compose(map(videoEntries), http.getJSON);
+
+
 
   // IMPURE ////////////////////////////////////////////////////////////////////////////
 
-  getInputStream('#search').runIO().onValue(log);
+  getInputStream('#search').runIO().onValue(compose(fork(log), search));
 
 });
