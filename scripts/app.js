@@ -1,17 +1,18 @@
 /* global define */
 define([
   'jquery'
-, 'lodash'
+, 'ramda'
 , 'pointfree'
-,	'Maybe'
-,	'player'
-,	'youtube'
-], function($, _, P, Maybe, Player, youtube) {
+, 'Maybe'
+, 'player'
+, 'youtube'
+, 'bacon'
+], function($, _, P, Maybe, Player, youtube, bacon) {
   'use strict';
 
   // some "move out over here" helpers
   var compose = P.compose;
-  var fmap = P.fmap;
+  var map = P.map;
   var log = function(x){ console.log(x); return x;}
   var fork = _.curry(function(f, future) { return future.fork(log, f) })
   var setHtml = _.curry(function(sel, x) { return $(sel).html(x); });
@@ -24,10 +25,10 @@ define([
 
   // setup click to player stream
   var toYoutubeId = function(e){ return $(e.target).data('youtubeid'); }
-  var makePlayer = compose(fmap(Player.create), Maybe, toYoutubeId)
+  var makePlayer = compose(map(Player.create), Maybe, toYoutubeId)
   var playerStream = Bacon.fromEventTarget(document, "click").map(makePlayer);
 
   // run app
   youTubeStream.onValue(fork(setHtml('#results')));
-  playerStream.onValue(fmap(setHtml('#player')));
+  playerStream.onValue(map(setHtml('#player')));
 });

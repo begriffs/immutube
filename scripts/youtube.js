@@ -1,7 +1,7 @@
 /* global define */
 define([
   'jquery'
-, 'lodash'
+, 'ramda'
 , 'io'
 , 'http'
 , 'pointfree'

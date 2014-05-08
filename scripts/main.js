@@ -2,7 +2,7 @@
 
 require.config({ baseUrl: '/scripts'
                , paths : { 'jquery': 'vendor/jquery/dist/jquery.min'
-                         , 'lodash': 'vendor/lodash/dist/lodash'
+                         , 'ramda': 'ramda'
                          , 'pointfree': 'vendor/pointfree/dist/pointfree.amd'
                          , 'future': 'data.future.umd'
                          , 'bacon': 'vendor/bacon/dist/Bacon.min'
@@ -11,6 +11,7 @@ require.config({ baseUrl: '/scripts'
                , shim: { jquery: { exports: '$' }
                        , socketio: { exports: 'io' }
                        , lodash: { exports: '_' }
+                       , ramda: { exports: 'ramda' }
                        }
                 });
 require([
