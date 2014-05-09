@@ -12,7 +12,7 @@ define([
   'use strict';
   io.extendFn();
 
-  // HELPERS ///////////////////////////////////////////////////////////////////////////
+  // HELPERS ///////////////////////////////////////////
   var compose = P.compose;
   var map = P.map;
   var log = function(x) { console.log(x); return x; }
@@ -21,8 +21,10 @@ define([
   var listen = _.curry(function (event, target) {
     return bacon.fromEventTarget(target, event);
   });
+  var getData = _.curry(function(name, elt) { return $(elt).data(name); });
+  var last = function(ar) { return ar[ar.length - 1]; };
 
-  // PURE //////////////////////////////////////////////////////////////////////////////
+  // PURE //////////////////////////////////////////////////
 
   //+ eventValue :: DomEvent -> String
   var eventValue = compose(_.get('value'), _.get('target'));
@@ -53,11 +55,23 @@ define([
   //+ search :: URL -> Future [Dom]
   var search = compose(map(videoEntries), http.getJSON);
 
+  //+ DomElement -> EventStream DomElement
+  var clickStream = compose(map(_.get('target')), listen('click'));
 
-  // IMPURE ////////////////////////////////////////////////////////////////////////////
+  //+ URL -> String
+  var idInUrl = compose(last, _.split('/'));
+
+  //+ youtubeLink :: DomElement -> Maybe ID
+  var youtubeId = compose(map(idInUrl), Maybe, getData('youtubeid'));
+
+  // IMPURE /////////////////////////////////////////////////////
 
   getInputStream('#search').runIO().onValue(
     compose(fork(setHtml('#results')), search)
+  );
+
+  clickStream(document).onValue(
+    compose(map(compose(setHtml('#player'), Player.create)), youtubeId)
   );
 
 });
