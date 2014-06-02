@@ -14,13 +14,11 @@ require.config({ baseUrl: '/scripts'
                        , ramda: { exports: 'ramda' }
                        }
                 });
-require([
-  'jquery',
-  'app',
-  'io'
-], function($, app, io){
-  'use strict';
+require(
+  [ 'jquery', 'app' ],
+  function($, app){
+    'use strict';
 
-  io.extendFn(); // globally alters Function's prototype
-  $(app);
-});
+    $(app);
+  }
+);

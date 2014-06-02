@@ -5,30 +5,73 @@ define([
 , 'pointfree'
 , 'Maybe'
 , 'player'
-, 'youtube'
+, 'io'
 , 'bacon'
-], function($, _, P, Maybe, Player, youtube, bacon) {
+, 'http'
+], function($, _, P, Maybe, Player, io, bacon, http) {
   'use strict';
+  io.extendFn();
 
-  // some "move out over here" helpers
+  // HELPERS ///////////////////////////////////////////
   var compose = P.compose;
   var map = P.map;
-  var log = function(x){ console.log(x); return x;}
-  var fork = _.curry(function(f, future) { return future.fork(log, f) })
+  var log = function(x) { console.log(x); return x; }
+  var fork = _.curry(function(f, future) { return future.fork(log, f); })
   var setHtml = _.curry(function(sel, x) { return $(sel).html(x); });
+  var listen = _.curry(function (event, target) {
+    return bacon.fromEventTarget(target, event);
+  });
+  var getData = _.curry(function(name, elt) { return $(elt).data(name); });
+  var last = function(ar) { return ar[ar.length - 1]; };
 
+  // PURE //////////////////////////////////////////////////
 
-  // setup youtube search li stream
-  var toParam = function (x) { return {q: x.target.value}; };
-  var getResults = compose(youtube, toParam)
-  var youTubeStream = Bacon.fromEventTarget($("#search"), "keydown").debounce(300).map(getResults);
+  //+ eventValue :: DomEvent -> String
+  var eventValue = compose(_.get('value'), _.get('target'));
 
-  // setup click to player stream
-  var toYoutubeId = function(e){ return $(e.target).data('youtubeid'); }
-  var makePlayer = compose(map(Player.create), Maybe, toYoutubeId)
-  var playerStream = Bacon.fromEventTarget(document, "click").map(makePlayer);
+  //+ valueStream :: DomEvent -> EventStream String
+  var valueStream = compose(map(eventValue), listen('keyup'));
 
-  // run app
-  youTubeStream.onValue(fork(setHtml('#results')));
-  playerStream.onValue(map(setHtml('#player')));
+  //+ termToUrl :: String -> URL
+  var termToUrl = function(term) {
+    return 'http://gdata.youtube.com/feeds/api/videos?' +
+      $.param({q: term, alt: 'json'});
+  };
+
+  //+ urlStream :: DomEvent -> EventStream String
+  var urlStream = compose(map(termToUrl), valueStream);
+
+  //+ getInputStream :: Selector -> IO EventStream String
+  var getInputStream = compose(map(urlStream), $.toIO());
+
+  //+ render :: Entry -> Dom
+  var render = function(e) {
+    return $('<li/>', {text: e.title.$t, 'data-youtubeid': e.id.$t});
+  };
+
+  //+ videoEntries :: YoutubeResponse -> [Dom]
+  var videoEntries = compose(map(render), _.get('entry'), _.get('feed'));
+
+  //+ search :: URL -> Future [Dom]
+  var search = compose(map(videoEntries), http.getJSON);
+
+  //+ DomElement -> EventStream DomElement
+  var clickStream = compose(map(_.get('target')), listen('click'));
+
+  //+ URL -> String
+  var idInUrl = compose(last, _.split('/'));
+
+  //+ youtubeLink :: DomElement -> Maybe ID
+  var youtubeId = compose(map(idInUrl), Maybe, getData('youtubeid'));
+
+  // IMPURE /////////////////////////////////////////////////////
+
+  getInputStream('#search').runIO().onValue(
+    compose(fork(setHtml('#results')), search)
+  );
+
+  clickStream(document).onValue(
+    compose(map(compose(setHtml('#player'), Player.create)), youtubeId)
+  );
+
 });
