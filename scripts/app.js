@@ -25,6 +25,9 @@ define([
   var last = function(ar) { return ar[ar.length - 1]; };
 
   // PURE //////////////////////////////////////////////////
+  
+  //  api_key :: String
+  var api_key = 'AIzaSyAWoa7aqds2Cx_drrrb5FPsRObFa7Dxkfg';
 
   //+ eventValue :: DomEvent -> String
   var eventValue = compose(_.get('value'), _.get('target'));
@@ -34,8 +37,8 @@ define([
 
   //+ termToUrl :: String -> URL
   var termToUrl = function(term) {
-    return 'http://gdata.youtube.com/feeds/api/videos?' +
-      $.param({q: term, alt: 'json'});
+    return 'https://www.googleapis.com/youtube/v3/search?' +
+      $.param({part: 'snippet', q: term, key: api_key});
   };
 
   //+ urlStream :: DomEvent -> EventStream String
@@ -46,11 +49,11 @@ define([
 
   //+ render :: Entry -> Dom
   var render = function(e) {
-    return $('<li/>', {text: e.title.$t, 'data-youtubeid': e.id.$t});
+    return $('<li/>', {text: e.snippet.title, 'data-youtubeid': e.id.videoId});
   };
 
   //+ videoEntries :: YoutubeResponse -> [Dom]
-  var videoEntries = compose(map(render), _.get('entry'), _.get('feed'));
+  var videoEntries = compose(map(render), _.get('items'));
 
   //+ search :: URL -> Future [Dom]
   var search = compose(map(videoEntries), http.getJSON);
